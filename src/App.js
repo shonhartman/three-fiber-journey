@@ -1,15 +1,35 @@
-import './App.css';
-import { Canvas } from '@react-three/fiber';
-import Experience from './Experience';
+import { OrbitControls, useTexture, Sphere, Stage } from '@react-three/drei'
+import { Canvas } from '@react-three/fiber'
+import { useControls } from 'leva'
+import React, { Suspense } from 'react'
+import * as THREE from 'three'
 
-function App() {
+function Box() {
+  const { args1 } = useControls({ args1: [1, 32, 32] })
+  const textureProps = useTexture({
+    map: 'texture/color.jpg',
+    displacementMap: 'texture/displacement.jpg',
+    metalnessMap: 'texture/metalness.jpg',
+    normalMap: 'texture/normal.jpg',
+    roughnessMap: 'texture/roughness.jpg',
+  })
   return (
-    <>
-      <Canvas>
-        <Experience/>
-      </Canvas>
-    </>
-  );
+    <Sphere args={[...args1]} scale={10}>
+      <meshPhysicalMaterial {...textureProps} map-magFilter={THREE.NearestFilter} displacementScale={0.5} />
+    </Sphere>
+  )
 }
 
-export default App;
+export default function App() {
+  return (
+    <Canvas style={{height: "100vh"}} shadows dpr={[1, 2]}>
+      <OrbitControls makeDefault autoRotate />
+      <Suspense fallback={null}>
+        <Stage preset="rembrandt" intensity={1} environment="city">
+          <Box />
+        </Stage>
+      </Suspense>
+    </Canvas>
+  )
+}
+
